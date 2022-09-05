@@ -1,0 +1,47 @@
+﻿@inherits LayoutComponentBase
+
+<MudThemeProvider />
+<MudDialogProvider />
+<MudSnackbarProvider />
+
+<MudLayout Style="background-color:#fff">
+    <MudAppBar Elevation="1" Dense="@dense">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start" OnClick="@ToggleDrawer" />
+        <MudSpacer />
+        <MudIconButton Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Link="https://github.com/dorisoy" Target="_blank" />
+    </MudAppBar>
+    <MudDrawer @bind-Open="@open" ClipMode="clipMode" Breakpoint="@breakpoint" PreserveOpenState="@preserveOpenState" Elevation="1" Variant="@DrawerVariant.Mini">
+        <MudDrawerHeader Class="d-flex justify-center align-center" Style="background-color:#512bdf;height:50px">
+            @if (open)
+            {
+                <MudIcon Icon="@Icons.Filled.LogoDev" Style="margin:0px;color:#fff" Class="mr-2" />
+                <MudText Typo="Typo.h6" Style="color:#fff">Dory.Rigger</MudText>
+            }
+            else
+            {
+                <MudIcon Icon="@Icons.Filled.LogoDev" Style="margin:0px;font-size: 3rem;color:#fff" Class="align-self-center" />
+            }
+        </MudDrawerHeader>
+        <NavMenu SideBarOpen="_sidebarOpen" />
+    </MudDrawer>
+    <MudMainContent Class="pa-8">
+        @Body
+    </MudMainContent>
+</MudLayout>
+
+@code {
+    private bool _sidebarOpen = false;
+    private void ToggleSidebar() => _sidebarOpen = !_sidebarOpen;
+
+
+    bool open = false;
+    bool dense = false;
+    bool preserveOpenState = false;
+    Breakpoint breakpoint = Breakpoint.Lg;
+    DrawerClipMode clipMode = DrawerClipMode.Never;
+
+    void ToggleDrawer()
+    {
+        open = !open;
+    }
+}

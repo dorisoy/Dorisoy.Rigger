@@ -1,0 +1,264 @@
+﻿@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using SharedUI.Models
+
+<MudGrid Class="mt-12">
+    <MudItem xs="12" sm="8">
+        <MudPaper Class="pa-4">
+            <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        <MudSelect Margin="Margin.Dense" T="DbType" @bind-Value="@model.dbType" Label="数据库类型" Variant="Variant.Outlined">
+                            <MudSelectItem Value="@(new DbType("SQLServer",0))" />
+                            <MudSelectItem Value="@(new DbType("MySQL",1))" />
+                            <MudSelectItem Value="@(new DbType("PostgreSQL",2))" />
+                            <MudSelectItem Value="@(new DbType("Oracle",3))" />
+                        </MudSelect>
+                    </MudItem>
+                    <MudItem xs="12" sm="8">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.connectionString" Label="数据连接" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.code" Label="模块编码" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.number" Label="模块编号" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.description" Label="模块描述" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.solutionName" Label="方案名称" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.modelsNamespace" Label="领域模型命名空间" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.viewmodelsNamespace" Label="视图模型命名空间" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.controllersNamespace" Label="控制器命名空间" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.iRepositoriesNamespace" Label="仓储接口命名空间" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.repositoriesNamespace" Label="仓储命名空间" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                </MudGrid>
+
+                <MudGrid>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.iServicesNamespace" Label="服务接口命名空间" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="4">
+                        <MudTextField Margin="Margin.Dense" @bind-Value="model.servicesNamespace" Label="服务命名空间" Variant="Variant.Outlined"></MudTextField>
+                    </MudItem>
+                    <MudItem xs="12" sm="4" Class="d-flex justify-end">
+                        <MudSwitch @bind-Checked="@model.isPascalCase" Color="Color.Primary" Label="使用帕斯卡命名法"/>
+                    </MudItem>
+                </MudGrid>
+
+            </MudForm>
+        </MudPaper>
+        <MudPaper Class="pa-4 mt-4 d-flex justify-end">
+            <MudSpacer />
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.LinkOff" Color="Color.Error" DisableElevation="true" OnClick="@(()=>form.Validate())" Class="mr-2">测试连接</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.LockReset" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>form.Reset())" Class="mr-2">重置</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.GetApp" Color="Color.Warning" DisableElevation="true" OnClick="@(()=>form.ResetValidation())" Class="mr-2">获取表</MudButton>
+            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Create" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>form.Validate())">生成项目</MudButton>
+        </MudPaper>
+    </MudItem>
+    <MudItem xs="12" sm="4">
+        <MudPaper Class="pa-4 mud-height-full">
+          @*  <MudText Typo="Typo.subtitle2">@($"输出 ({errors.Length})")</MudText>
+
+*@
+            <MudTextField @ref="multilineReference" T="string" 
+                Label="@($"输出 ({errors.Length})")" 
+                Lines="13" 
+                Variant="Variant.Outlined" 
+                Text="正在获取数据..." 
+                Adornment="Adornment.End"
+                AdornmentIcon="@Icons.Filled.Api"
+                OnAdornmentClick="@(() => multilineReference.SelectAsync())" />
+@*
+            @foreach (var error in errors)
+            {
+                <MudText Color="@Color.Error">@error</MudText>
+            }*@
+
+            <MudProgressLinear Color="Color.Primary" Rounded="true" Size="Size.Large" Value="25" Striped="true" Class="my-7">
+                <MudText Typo="Typo.subtitle1" Color="Color.Primary">
+                    <b>25%</b>
+                </MudText>
+            </MudProgressLinear>
+
+        </MudPaper>
+    </MudItem>
+</MudGrid>
+
+@*表数据*@
+<_Template Items="@DbTables"></_Template>
+
+
+@code {
+    bool success;
+    string[] errors = { };
+    MudTextField<string> pwField1;
+    MudForm form;
+    private IEnumerable<string> PasswordStrength(string pw)
+    {
+        if (string.IsNullOrWhiteSpace(pw))
+        {
+            yield return "Password is required!";
+            yield break;
+        }
+
+        if (pw.Length < 8)
+            yield return "Password must be at least of length 8";
+        if (!Regex.IsMatch(pw, @"[A-Z]"))
+            yield return "Password must contain at least one capital letter";
+        if (!Regex.IsMatch(pw, @"[a-z]"))
+            yield return "Password must contain at least one lowercase letter";
+        if (!Regex.IsMatch(pw, @"[0-9]"))
+            yield return "Password must contain at least one digit";
+
+        // pattern: /^[a-zA-Z\u0391-\uFFE5][0-9a-zA-Z\u0391-\uFFE5\.]*$/, message: '请输入非数字或者特殊字符开头的项目名称', trigger: 'change'
+    }
+    private MudTextField<string> multilineReference;
+    public Model model { get; set; } = new Model();
+    public record DIcons(string icon, int color);
+    public record DbType(string label, int value)
+    {
+        public override string ToString() => label;
+    }
+
+    private void Add()
+    {
+        //var that = DbTables.First();
+    }
+
+    private void Remove(Guid no)
+    {
+        if (DbTables.Count() <= 1) return;
+
+        var find = DbTables.Where(s => s.Id == no).First();
+
+        if (find != null)
+            DbTables.Remove(find);
+    }
+
+    public class Model
+    {
+        public static string newValue { get; set; } = "TP";
+        public string connectionString { get; set; } = "initial catalog=DoryRigger;data source=DESKTOP-N3DG9IC;password=xxx;User id=sa;MultipleActiveResultSets=True";
+        public string outputPath { get; set; } = "D:\\CodeGenerates";
+        public string solutionName { get; set; } = "TPService";
+         public string code { get; set; } = newValue;
+        public string number { get; set; } = "001";
+        public string description { get; set; } = "协议终端模块";
+        public string modelsNamespace { get; set; } = newValue + ".Models";
+        public string viewmodelsNamespace { get; set; }= newValue + ".ViewModels";
+        public string controllersNamespace { get; set; } = newValue + ".Controllers";
+        public string iRepositoriesNamespace { get; set; }= newValue + ".IRepositories";
+        public string repositoriesNamespace { get; set; }= newValue + ".Repositories";
+        public string iServicesNamespace { get; set; }= newValue + ".IServices";
+        public string servicesNamespace { get; set; }= newValue + ".Services";
+        public bool generateApiController { get; set; }= true;
+        public bool isPascalCase { get; set; } = true;
+        public bool keepPrefix { get; set; }
+        public string prefixes { get; set; }
+        public DIcons icon { get; set; }
+        public DbType dbType { get; set; }
+        public object tableData { get; set; }
+        public List<object> tableDatas { get; set; } = new();
+        public List<DIcons> icons = new List<DIcons>();
+        public List<DbType> dbTypes = new List<DbType>();
+    }
+
+    protected override void OnInitialized()
+    {
+        FillTable();
+    }
+
+    private void FillTable()
+    {
+        List<DbTable> dbTables = new List<DbTable>();
+        List<DbTableColumn> columns = new List<DbTableColumn>();
+
+        columns.Add(new DbTableColumn
+            {
+                TableName = "FillTable",
+                ColName = "Name",
+                Alias = "FillTable",
+                IsIdentity = true,
+                IsPrimaryKey = true,
+                ColumnType = "nvchar",
+                ColumnLength = 50,
+                IsNullable = true,
+                DefaultValue = "0",
+                Comments = "姓名",
+                CSharpType = "String",
+                DataPrecision = 0,
+                DataScale = 0
+            });
+
+        columns.Add(new DbTableColumn
+            {
+                TableName = "FillTable",
+                ColName = "Age",
+                Alias = "FillTable",
+                IsIdentity = true,
+                IsPrimaryKey = true,
+                ColumnType = "nvchar",
+                ColumnLength = 50,
+                IsNullable = true,
+                DefaultValue = "0",
+                Comments = "年龄",
+                CSharpType = "String",
+                DataPrecision = 0,
+                DataScale = 0
+            });
+
+        dbTables.Add(new DbTable
+            {
+                ShowDetails = false,
+                TableName = "Setting",
+                Alias = "Setting",
+                TableComment = "配置信息表",
+                Columns = columns
+            });
+        dbTables.Add(new DbTable
+            {
+                ShowDetails = false,
+                TableName = "Users",
+                Alias = "Users",
+                TableComment = "用户表",
+                Columns = columns
+            });
+
+        dbTables.Add(new DbTable
+            {
+                ShowDetails = false,
+                TableName = "UserRoles",
+                Alias = "UserRoles",
+                TableComment = "用户角色表",
+                Columns = columns
+            });
+        DbTables = dbTables;
+    }
+    private static List<DbTable> DbTables { get; set; }
+    private void ShowBtnPress(Guid nr)
+    {
+        DbTable tmpTable = DbTables.First(f => f.Id == nr);
+        tmpTable.ShowDetails = !tmpTable.ShowDetails;
+    }
+}

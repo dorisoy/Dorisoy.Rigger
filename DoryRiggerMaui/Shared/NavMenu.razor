@@ -1,0 +1,17 @@
+﻿@inject IDialogService Dialog
+
+<MudList Clickable="true">
+    <MudListItem Text="配置" Icon="@Icons.Filled.Settings" IconColor="Color.Primary" Style="height:50px" Href="/" />
+    <MudListItem Text="模板" Icon="@Icons.Filled.LibraryBooks" IconColor="Color.Primary" Style="height:50px" Href="/template" />
+    <MudDivider />
+    <MudListItem Text="关于" Icon="@Icons.Filled.Info" IconColor="Color.Primary" Style="height:50px" OnClick="@((e) => OpenDialog())"/>
+</MudList>
+
+@code {
+    [Parameter]
+    public bool SideBarOpen { get; set; }
+    private void OpenDialog()
+    {
+        Dialog.Show<Dialog>("关于", new DialogOptions() { CloseButton = true });
+    }
+}

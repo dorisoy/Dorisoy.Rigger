@@ -1,0 +1,211 @@
+﻿@using System.Text.RegularExpressions
+@using System.ComponentModel.DataAnnotations
+@using SharedUI.Models
+
+<MudTable Items="@Items" Hover="true" Breakpoint="Breakpoint.Sm" Striped="true" Class="mt-14">
+    <ColGroup>
+        <col style="width:120px;" />
+        <col style="width:350px;" />
+        <col style="width:300px;" />
+        <col style="width:300px;" />
+        <col />
+        <col style="width:100px;" />
+    </ColGroup>
+    <HeaderContent>
+        <MudTh></MudTh>
+        <MudTh>编号</MudTh>
+        <MudTh>表名</MudTh>
+        <MudTh>别名</MudTh>
+        <MudTh>描述</MudTh>
+        <MudTh>操作</MudTh>
+    </HeaderContent>
+    <RowTemplate>
+        <MudTd>
+            <MudButton Variant="Variant.Outlined"
+                       StartIcon="@((context.ShowDetails == true) ? Icons.Filled.ArrowCircleDown : Icons.Filled.ArrowCircleRight)"
+                       Size="Size.Small"
+                       Color="Color.Primary"
+                       OnClick="@(() => ShowBtnPress(context.Id))">@((context.ShowDetails == true) ? "隐藏" : "显示")</MudButton>
+            </MudTd>
+            <MudTd>@context.Id</MudTd>
+            <MudTd>@context.TableName</MudTd>
+            <MudTd>@context.Alias</MudTd>
+            <MudTd>@context.TableComment</MudTd>
+            <MudTd>
+                <MudButtonGroup Variant="Variant.Filled">
+                    <MudIconButton Icon="@Icons.Filled.TableView"
+                               Color="Color.Primary"
+                               OnClick="Add" />
+
+                    <MudIconButton Icon="@Icons.Filled.Delete"
+                               Color="Color.Primary"
+                               OnClick="@(()=>Remove(context.Id))" />
+                </MudButtonGroup>
+            </MudTd>
+        </RowTemplate>
+        <ChildRowContent>
+
+        @if (context.ShowDetails)
+        {
+            <MudTr>
+                <td colspan="6">
+                    <MudCard Elevation="0">
+
+                        <MudCardContent Class="pa-0">
+                            <MudTable Items="@context.Columns" Context="Col" Hover="true" Breakpoint="Breakpoint.Sm" Elevation="0">
+                                <ColGroup>
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                    <col />
+                                </ColGroup>
+                                <HeaderContent>
+                                    <MudTh>表名</MudTh>
+                                    <MudTh>字段名</MudTh>
+                                    <MudTh>别名</MudTh>
+                                    <MudTh>是否自增</MudTh>
+                                    <MudTh>是否主键</MudTh>
+                                    <MudTh>字段类型</MudTh>
+                                    <MudTh>数据长度</MudTh>
+                                    <MudTh>是否为空</MudTh>
+                                    <MudTh>默认值</MudTh>
+                                    <MudTh>描述</MudTh>
+                                    <MudTh>C#数据类型</MudTh>
+                                    <MudTh>数据精度</MudTh>
+                                    <MudTh>数据刻度</MudTh>
+                                </HeaderContent>
+                                <RowTemplate>
+                                    <MudTd DataLabel="ColName">@Col.TableName</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.ColName</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.Alias</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.IsIdentity</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.IsPrimaryKey</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.ColumnType</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.ColumnLength</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.IsNullable</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.DefaultValue</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.Comments</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.CSharpType</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.DataPrecision</MudTd>
+                                    <MudTd DataLabel="ColName">@Col.DataScale</MudTd>
+                                </RowTemplate>
+                            </MudTable>
+                        </MudCardContent>
+                    </MudCard>
+                </td>
+            </MudTr>
+        }
+    </ChildRowContent>
+</MudTable>
+
+
+
+@code {
+    bool success;
+
+    private void Add()
+    {
+        var that = Items.First();
+    }
+
+    private void Remove(Guid no)
+    {
+        if (Items.Count() <= 1) return;
+
+        var find = Items.Where(s => s.Id == no).First();
+
+        if (find != null)
+            Items.Remove(find);
+    }
+
+    protected override void OnInitialized()
+    {
+        FillTable();
+    }
+
+    private void FillTable()
+    {
+        List<DbTable> dbTables = new List<DbTable>();
+        List<DbTableColumn> columns = new List<DbTableColumn>();
+
+        columns.Add(new DbTableColumn
+            {
+                TableName = "FillTable",
+                ColName = "Name",
+                Alias = "FillTable",
+                IsIdentity = true,
+                IsPrimaryKey = true,
+                ColumnType = "nvchar",
+                ColumnLength = 50,
+                IsNullable = true,
+                DefaultValue = "0",
+                Comments = "姓名",
+                CSharpType = "String",
+                DataPrecision = 0,
+                DataScale = 0
+            });
+
+        columns.Add(new DbTableColumn
+            {
+                TableName = "FillTable",
+                ColName = "Age",
+                Alias = "FillTable",
+                IsIdentity = true,
+                IsPrimaryKey = true,
+                ColumnType = "nvchar",
+                ColumnLength = 50,
+                IsNullable = true,
+                DefaultValue = "0",
+                Comments = "年龄",
+                CSharpType = "String",
+                DataPrecision = 0,
+                DataScale = 0
+            });
+
+        dbTables.Add(new DbTable
+            {
+                ShowDetails = false,
+                TableName = "Setting",
+                Alias = "Setting",
+                TableComment = "配置信息表",
+                Columns = columns
+            });
+        dbTables.Add(new DbTable
+            {
+                ShowDetails = false,
+                TableName = "Users",
+                Alias = "Users",
+                TableComment = "用户表",
+                Columns = columns
+            });
+
+        dbTables.Add(new DbTable
+            {
+                ShowDetails = false,
+                TableName = "UserRoles",
+                Alias = "UserRoles",
+                TableComment = "用户角色表",
+                Columns = columns
+            });
+        Items = dbTables;
+    }
+
+    [Parameter]
+    public List<DbTable> Items { get; set; }
+
+    private void ShowBtnPress(Guid nr)
+    {
+        DbTable tmpTable = Items.First(f => f.Id == nr);
+        tmpTable.ShowDetails = !tmpTable.ShowDetails;
+    }
+
+}

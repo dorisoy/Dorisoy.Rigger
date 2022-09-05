@@ -1,0 +1,16 @@
+﻿
+<MudAppBar Elevation="21" Dense="true">
+    <MudIconButton Icon="@Icons.Material.Filled.Menu" Color="Color.Inherit" Edge="Edge.Start"
+                   OnClick="async () => await OnSidebarToggled.InvokeAsync()" />
+    <MudSpacer />
+    <MudIconButton Href="#" Icon="@Icons.Custom.Brands.Facebook" Color="Color.Inherit" Size="Size.Medium" Edge="Edge.Start" />
+    <MudIconButton Href="#" Icon="@Icons.Custom.Brands.GitHub" Color="Color.Inherit" Size="Size.Medium" Edge="Edge.Start" />
+    <MudIconButton Href="#" Icon="@Icons.Custom.Brands.Instagram" Color="Color.Inherit" Size="Size.Medium" Edge="Edge.Start" />
+    <MudIconButton Href="#" Icon="@Icons.Custom.Brands.Twitter" Color="Color.Inherit" Size="Size.Medium" Edge="Edge.Start" />
+</MudAppBar>
+
+
+@code {
+    [Parameter]
+    public EventCallback OnSidebarToggled { get; set; }
+}

@@ -1,0 +1,22 @@
+﻿
+<MudDialog DisableSidePadding="true" Style="width:250px;height:300px">
+    <DialogContent>
+       <MudContainer Class="d-flex align-center align-content-center justify-center">
+            <MudGrid>
+                <MudItem xs="12" Class="d-flex align-center align-content-center justify-center">
+                    <MudImage Src="/Images/avatar.jpg" Alt="Dorisoy's Blog" Elevation="25" Class="rounded-lg align-self-center" Width="100" Height="100" />
+                </MudItem>
+                <MudItem xs="12">
+                    <MudLink Style="white-space: pre-wrap;" Href="http://www.dorisoy.com/">© Dorisoy @DateTime.Now.Year</MudLink>
+                </MudItem>
+            </MudGrid>
+        </MudContainer>
+    </DialogContent>
+</MudDialog>
+
+
+@code {
+    [CascadingParameter] MudDialogInstance MudDialog { get; set; }
+
+    void Ok() => MudDialog.Close(DialogResult.Ok(true));
+}
