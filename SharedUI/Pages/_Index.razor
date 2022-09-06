@@ -1,6 +1,7 @@
 ﻿@using System.Text.RegularExpressions
 @using System.ComponentModel.DataAnnotations
 @using SharedUI.Models
+@inject ISnackbar Snackbar
 
 <MudGrid Class="mt-12">
     <MudItem xs="12" sm="8">
@@ -17,7 +18,18 @@
                         </MudSelect>
                     </MudItem>
                     <MudItem xs="12" sm="8">
-                        <MudTextField Margin="Margin.Dense" @bind-Value="model.connectionString" Label="数据连接" Variant="Variant.Outlined"></MudTextField>
+                   @*     <MudTextField Margin="Margin.Dense" @bind-Value="model.connectionString" Label="数据连接" Variant="Variant.Outlined" />
+*@
+                              <MudTextField Margin="Margin.Dense"
+                                  @bind-Value="@model.connectionString"
+                                  Label="数据连接"
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.End"
+                                  AdornmentIcon="@Icons.Filled.LinkOff"
+                                  AdornmentColor="Color.Secondary"
+                                      OnAdornmentClick="@(() => Snackbar.Add("连接成功！"))" />
+
+                          @* <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.LinkOff" Color="Color.Error" DisableElevation="true" OnClick="@(()=>form.Validate())">测试连接</MudButton>*@
                     </MudItem>
                 </MudGrid>
                 <MudGrid>
@@ -62,37 +74,60 @@
                         <MudTextField Margin="Margin.Dense" @bind-Value="model.servicesNamespace" Label="服务命名空间" Variant="Variant.Outlined"></MudTextField>
                     </MudItem>
                     <MudItem xs="12" sm="4" Class="d-flex justify-end">
-                        <MudSwitch @bind-Checked="@model.isPascalCase" Color="Color.Primary" Label="使用帕斯卡命名法"/>
+                        <MudSwitch @bind-Checked="@model.isPascalCase" Color="Color.Primary" Label="使用帕斯卡命名法" />
                     </MudItem>
                 </MudGrid>
 
             </MudForm>
         </MudPaper>
-        <MudPaper Class="pa-4 mt-4 d-flex justify-end">
-            <MudSpacer />
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.LinkOff" Color="Color.Error" DisableElevation="true" OnClick="@(()=>form.Validate())" Class="mr-2">测试连接</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.LockReset" Color="Color.Secondary" DisableElevation="true" OnClick="@(()=>form.Reset())" Class="mr-2">重置</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.GetApp" Color="Color.Warning" DisableElevation="true" OnClick="@(()=>form.ResetValidation())" Class="mr-2">获取表</MudButton>
-            <MudButton Variant="Variant.Filled" StartIcon="@Icons.Filled.Create" Color="Color.Primary" DisableElevation="true" OnClick="@(()=>form.Validate())">生成项目</MudButton>
+        <MudPaper Class="pa-4 mt-4">
+            <MudGrid>
+                <MudItem xs="12" sm="6">
+                    <MudTextField Margin="Margin.Dense"
+                                  @bind-Value="@model.outputPath"
+                                  Label="代码生成目录"
+                                  Variant="Variant.Outlined"
+                                  Adornment="Adornment.End"
+                                  AdornmentIcon="@Icons.Filled.Search"
+                                  AdornmentColor="Color.Secondary"
+                                  OnAdornmentClick="OnPickFolderClicked" />
+                </MudItem>
+                <MudItem xs="12" sm="6" Class="pt-4" Style="text-align:right">
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Filled.LockReset"
+                               Color="Color.Secondary"
+                               DisableElevation="true"
+                               OnClick="@(()=>form.Reset())"
+                               Class="mr-2">重置</MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Filled.GetApp"
+                               Color="Color.Warning"
+                               DisableElevation="true"
+                               OnClick="@(()=>form.ResetValidation())"
+                               Class="mr-2">获取表</MudButton>
+                    <MudButton Variant="Variant.Filled"
+                               StartIcon="@Icons.Filled.Create"
+                               Color="Color.Primary"
+                               DisableElevation="true">生成项目</MudButton>
+                </MudItem>
+            </MudGrid>
+            @*<MudSpacer />*@
         </MudPaper>
     </MudItem>
     <MudItem xs="12" sm="4">
         <MudPaper Class="pa-4 mud-height-full">
-          @*  <MudText Typo="Typo.subtitle2">@($"输出 ({errors.Length})")</MudText>
-
-*@
-            <MudTextField @ref="multilineReference" T="string" 
-                Label="@($"输出 ({errors.Length})")" 
-                Lines="13" 
-                Variant="Variant.Outlined" 
-                Text="正在获取数据..." 
-                Adornment="Adornment.End"
-                AdornmentIcon="@Icons.Filled.Api"
-                OnAdornmentClick="@(() => multilineReference.SelectAsync())" />
-@*
+            <MudTextField @ref="multilineReference" T="string"
+                          Label="@($"输出 ({errors.Length})")"
+                          Lines="13"
+                          Variant="Variant.Outlined"
+                          Text="正在获取数据..."
+                          Adornment="Adornment.End"
+                          AdornmentIcon="@Icons.Filled.Api"
+                          OnAdornmentClick="@(() => multilineReference.SelectAsync())" />
+            @*
             @foreach (var error in errors)
             {
-                <MudText Color="@Color.Error">@error</MudText>
+            <MudText Color="@Color.Error">@error</MudText>
             }*@
 
             <MudProgressLinear Color="Color.Primary" Rounded="true" Size="Size.Large" Value="25" Striped="true" Class="my-7">
@@ -162,17 +197,17 @@
         public string connectionString { get; set; } = "initial catalog=DoryRigger;data source=DESKTOP-N3DG9IC;password=xxx;User id=sa;MultipleActiveResultSets=True";
         public string outputPath { get; set; } = "D:\\CodeGenerates";
         public string solutionName { get; set; } = "TPService";
-         public string code { get; set; } = newValue;
+        public string code { get; set; } = newValue;
         public string number { get; set; } = "001";
         public string description { get; set; } = "协议终端模块";
         public string modelsNamespace { get; set; } = newValue + ".Models";
-        public string viewmodelsNamespace { get; set; }= newValue + ".ViewModels";
+        public string viewmodelsNamespace { get; set; } = newValue + ".ViewModels";
         public string controllersNamespace { get; set; } = newValue + ".Controllers";
-        public string iRepositoriesNamespace { get; set; }= newValue + ".IRepositories";
-        public string repositoriesNamespace { get; set; }= newValue + ".Repositories";
-        public string iServicesNamespace { get; set; }= newValue + ".IServices";
-        public string servicesNamespace { get; set; }= newValue + ".Services";
-        public bool generateApiController { get; set; }= true;
+        public string iRepositoriesNamespace { get; set; } = newValue + ".IRepositories";
+        public string repositoriesNamespace { get; set; } = newValue + ".Repositories";
+        public string iServicesNamespace { get; set; } = newValue + ".IServices";
+        public string servicesNamespace { get; set; } = newValue + ".Services";
+        public bool generateApiController { get; set; } = true;
         public bool isPascalCase { get; set; } = true;
         public bool keepPrefix { get; set; }
         public string prefixes { get; set; }
@@ -261,4 +296,12 @@
         DbTable tmpTable = DbTables.First(f => f.Id == nr);
         tmpTable.ShowDetails = !tmpTable.ShowDetails;
     }
+
+    //选择代码生成目录
+    private async void OnPickFolderClicked()
+    {
+        var pickedFolder = await _folderPicker.PickFolder();
+        model.outputPath = pickedFolder;
+    }
+
 }

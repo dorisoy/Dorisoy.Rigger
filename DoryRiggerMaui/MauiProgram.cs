@@ -10,11 +10,10 @@ using Microsoft.Maui.Controls.Xaml;
 using Microsoft.UI;
 using Microsoft.UI.Windowing;
 using Windows.Graphics;
-#endif
-
-
-#if WINDOWS
 using DoryRiggerMaui.WinUI;
+using SharedUI.Models;
+#elif MACCATALYST
+using SharedUI.Models;
 #endif
 
 namespace DoryRiggerMaui;
@@ -41,6 +40,9 @@ public static class MauiProgram
 #endif
 
 #if WINDOWS
+
+        builder.Services.AddTransient<SharedUI.Models.IFolderPicker, DoryRiggerMaui.Windows.FolderPicker>();
+
         builder.ConfigureLifecycleEvents(events =>
         {
             events.AddWindows(wndLifeCycleBuilder =>
@@ -75,6 +77,9 @@ public static class MauiProgram
                 });
             });
         });
+
+#elif MACCATALYST
+		builder.Services.AddTransient<SharedUI.Models.IFolderPicker, DoryRiggerMaui.MacCatalyst.FolderPicker>();
 #endif
         return builder.Build();
     }

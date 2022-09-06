@@ -404,18 +404,3 @@ ASALocalRun/
 # Local History for Visual Studio
 .localhistory/
 *.json
-*.git
-*.css
-*.js
-.git/
-*.cshtml
-wwwroot/
-*.razor
-*.cs
-*.txt
-*.xml
-Resources/
-*.csproj
-*.manifest
-*.xaml
-.vscode/
