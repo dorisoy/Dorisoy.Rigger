@@ -13,6 +13,10 @@ using Windows.Graphics;
 #endif
 
 
+#if WINDOWS
+using DoryRiggerMaui.WinUI;
+#endif
+
 namespace DoryRiggerMaui;
 
 public static class MauiProgram
@@ -36,47 +40,6 @@ public static class MauiProgram
         builder.Services.AddBlazorWebViewDeveloperTools();
 #endif
 
-
-        //builder.ConfigureLifecycleEvents(lifecycle =>
-        //{
-
-
-        //#if WINDOWS
-        //    lifecycle
-        //        .AddWindows (windows => {
-        //            _ = windows.OnWindowCreated ((w) => 
-        //            {
-        //                w.ExtendsContentIntoTitleBar = true;
-
-        //                var window = w as Microsoft.Maui.MauiWinUIWindow;
-        //                if (window is null)
-        //                    return;
-        //            });
-
-        //        });
-        //#endif
-
-
-        //#if WINDOWS
-        //         //lifecycle
-        //         //    .AddWindows(windows =>
-        //         //        windows.OnNativeMessage((app, args) => {
-        //         //            if (WindowExtensions.Hwnd == IntPtr.Zero)
-        //         //            {
-        //         //                WindowExtensions.Hwnd = args.Hwnd;
-        //         //                WindowExtensions.SetIcon("Platforms/Windows/trayicon.ico");
-        //         //            }
-        //         //        }));
-
-        //             lifecycle.AddWindows(windows => windows.OnWindowCreated((del) => {
-        //                 del.ExtendsContentIntoTitleBar = true;
-        //             }));
-        //#endif
-
-        //        });
-
-
-
 #if WINDOWS
         builder.ConfigureLifecycleEvents(events =>
         {
@@ -84,6 +47,10 @@ public static class MauiProgram
             {
                 wndLifeCycleBuilder.OnWindowCreated(window =>
                 {
+                    window.ExtendsContentIntoTitleBar = true; 
+
+                    window.SetTitleBar(new CustomTitleBar());
+
                     IntPtr nativeWindowHandle = WinRT.Interop.WindowNative.GetWindowHandle(window);
                     WindowId win32WindowsId = Win32Interop.GetWindowIdFromWindow(nativeWindowHandle);
                     AppWindow winuiAppWindow = AppWindow.GetFromWindowId(win32WindowsId);    
@@ -96,18 +63,19 @@ public static class MauiProgram
                        p.IsResizable=false;
                        p.IsMaximizable = false;
                        p.IsMinimizable=false;
+
+                       //p.SetBorderAndTitleBar(false, false);
                     }                     
                     else
                     {
-                        const int width = 1024;
-                        const int height = 768;
-                        winuiAppWindow.MoveAndResize(new RectInt32(1024 / 2 - width / 2, 768 / 2 - height / 2, width, height));                      
+                        const int width = 1200;
+                        const int height = 800;
+                        winuiAppWindow.MoveAndResize(new RectInt32(1920 / 2 - width / 2, 1080 / 2 - height / 2, width, height));                      
                     }                        
                 });
             });
         });
 #endif
-
         return builder.Build();
     }
 }

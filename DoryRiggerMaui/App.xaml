@@ -32,6 +32,7 @@
                         Value="{DynamicResource SecondaryColor}" />
             </Style>
 
+
         </ResourceDictionary>
     </Application.Resources>
 </Application>
