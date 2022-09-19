@@ -52,6 +52,10 @@
       <Compile Remove="Platforms\Windows\App - 复制.xaml.cs" />
     </ItemGroup>
 
+    <ItemGroup>
+      <PackageReference Include="Microsoft.Extensions.Http" Version="6.0.0" />
+    </ItemGroup>
+
    <!-- <ItemGroup>
       <PackageReference Include="MudBlazor" Version="6.0.14" />
     </ItemGroup>

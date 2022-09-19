@@ -5,6 +5,7 @@ using MudBlazor.Services;
 using Microsoft.Maui.Controls;
 using Microsoft.Maui.Controls.Compatibility;
 using Microsoft.Maui.Controls.Xaml;
+using Microsoft.Extensions.DependencyInjection;
 
 #if WINDOWS
 using Microsoft.UI;
@@ -30,7 +31,7 @@ public static class MauiProgram
             {
                 fonts.AddFont("OpenSans-Regular.ttf", "OpenSansRegular");
             });
-
+        builder.Services.AddHttpClient();
         builder.Services.AddMauiBlazorWebView();
 
         builder.Services.AddMudServices();

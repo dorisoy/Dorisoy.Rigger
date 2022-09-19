@@ -1,0 +1,204 @@
+﻿@using System.ComponentModel.DataAnnotations
+@using FluentValidation
+@using Microsoft.AspNetCore.Components.Forms
+@using System.Net.Http.Json
+@using System.Net.Http.Headers
+@using Newtonsoft.Json
+@inject HttpClient Http
+    <MudGrid Class="mt-12">
+    <MudItem xs="12" sm="7">
+        <MudCard>
+                <MudForm Model="@model" @ref="@form" Validation="@(registeInfoValidator.ValidateValue)" ValidationDelay="0">
+            <MudCardContent>
+                    <MudTextField Label="RegName" Class="mt-3" Immediate="true"
+                                  @bind-Value="model.RegName" For="@(() => model.RegName)" />
+                    <MudTextField Label="Email" Class="mt-3" Immediate="true"
+                                  @bind-Value="model.Email" For="@(() => model.Email)" />
+                    <MudTextField Label="MachineCode" Class="mt-3" ReadOnly="true"
+                                  @bind-Value="model.MachineCode" For="@(() => model.MachineCode)" />
+                    <MudTextField Label="RegistrationCode" Class="mt-3" Lines="7" ReadOnly="true"
+                                  @bind-Value="model.RegistrationCode" For="@(() => model.RegistrationCode)" />
+            </MudCardContent>
+            </MudForm>
+            <MudCardActions>
+                <MudButton ButtonType="ButtonType.Submit" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto">注册</MudButton>
+                 <MudButton ButtonType="ButtonType.Button" Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">校验</MudButton>
+
+            </MudCardActions>
+        </MudCard>
+    </MudItem>
+    <MudItem xs="12">
+        <MudText Typo="Typo.body2" Align="Align.Center">
+            Fill out the form correctly to see the success message.
+        </MudText>
+    </MudItem>
+</MudGrid>
+
+@code {
+    RegisteInfo model = new RegisteInfo();
+    bool success;
+    MudForm form;
+    RegisteInfoModelFluentValidator registeInfoValidator = new RegisteInfoModelFluentValidator();
+    //获取和设置包括该应用程序的目录的名称
+    string tokenDir = System.AppDomain.CurrentDomain.SetupInformation.ApplicationBase + "infos\\";
+    string tokenPath;
+
+
+    private void OnValidSubmit(EditContext context)
+    {
+        success = true;
+        StateHasChanged();
+    }
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            RegisterChecker tmp = new RegisterChecker();
+            model.MachineCode = tmp.GetMachineID(out string reeroinfo);
+            var token = await InitToken();
+            var reponseGetSN = await GetSNResponese(token);
+            var statusCode = reponseGetSN.StatusCode.ToString();
+            if (statusCode.Equals("Unauthorized"))
+            {
+                var res = await Http.GetFromJsonAsync<Response>("https://localhost:7167/login/CreateToken");
+                token = res.content.result;
+                ReWirteToken(token);
+                reponseGetSN = await GetSNResponese(token);
+            }
+            var responseSN = await reponseGetSN.Content.ReadAsStringAsync();
+            model.RegistrationCode = JsonConvert.DeserializeObject<Response>(responseSN).content.result;
+        }
+    }
+    public class Content
+    {
+        /// <summary>
+        ///
+        /// </summary>
+        public string result { get; set; }
+        /// <summary>
+        /// 操作成功
+        /// </summary>
+        public string message { get; set; }
+        /// <summary>
+        ///
+        /// </summary>
+        public int code { get; set; }
+    }
+
+    public class Response
+    {
+        /// <summary>
+        ///
+        /// </summary>
+        public bool isSuccess { get; set; }
+        /// <summary>
+        ///
+        /// </summary>
+        public Content content { get; set; }
+        /// <summary>
+        ///
+        /// </summary>
+        public string problemDetails { get; set; }
+    }
+
+    private void InfosCreate()
+    {
+        tokenPath = tokenDir + "token";
+        if (!Directory.Exists(tokenDir))
+        {
+            // 如果不存在就创建它.
+            Directory.CreateDirectory(tokenDir);
+        }
+    }
+    public string GetOidToken()
+    {
+        string oidToken = string.Empty;
+        InfosCreate();
+        if (File.Exists(tokenPath))
+        {
+            StreamReader reader = new StreamReader(tokenPath);
+            oidToken = reader.ReadToEnd();
+            reader.Close();
+        }
+        return oidToken;
+    }
+    private void WirteToken(string token)
+    {
+        InfosCreate();
+        FileStream fs = new FileStream(tokenPath, FileMode.Create);
+        StreamWriter sw = new StreamWriter(fs);
+        sw.WriteLine(token);
+        sw.Close();
+        fs.Close();
+    }
+    private void ReWirteToken(string token)
+    {
+        InfosCreate();
+        File.Delete(tokenPath);
+        FileStream fs = new FileStream(tokenPath, FileMode.Create);
+        StreamWriter sw = new StreamWriter(fs);
+        sw.WriteLine(token);
+        sw.Close();
+        fs.Close();
+    }
+
+    private async Task<HttpResponseMessage> GetSNResponese(string token)
+    {
+        var authenticationHeaderValue = new AuthenticationHeaderValue("bearer", token.Trim());
+        Http.DefaultRequestHeaders.Authorization = authenticationHeaderValue;
+        var content = new StringContent(JsonConvert.SerializeObject(model));
+        content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+        return await Http.PostAsync("https://localhost:7167/machine/GetSN", content);
+    }
+    public async Task<string> InitToken()
+    {
+        string oidToken = GetOidToken();
+        string token = string.Empty;
+        Response res = new Response();
+        if (oidToken == string.Empty)
+        {
+            res = await Http.GetFromJsonAsync<Response>("https://localhost:7167/login/CreateToken");
+            WirteToken(res.content.result);
+            token = res.content.result;
+        }
+        if (oidToken != string.Empty)
+        {
+            token = oidToken;
+        }
+        return token;
+    }
+
+    public class RegisteInfoModelFluentValidator : AbstractValidator<RegisteInfo>
+    {
+        public RegisteInfoModelFluentValidator()
+        {
+            RuleFor(x => x.RegName)
+                .NotEmpty()
+                .Length(1,100);
+
+            RuleFor(x => x.Email)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .EmailAddress()
+                .MustAsync(async (value, cancellationToken) => await IsUniqueAsync(value));
+		}
+
+        private async Task<bool> IsUniqueAsync(string email)
+        {
+            // Simulates a long running http call
+            await Task.Delay(2000);
+            return email.ToLower() != "test@test.com";
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<RegisteInfo>.CreateWithOptions((RegisteInfo)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+
+ }
