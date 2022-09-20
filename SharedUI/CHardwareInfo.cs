@@ -137,8 +137,6 @@ namespace SharedUI
             return "";
         }
 
-
-
         /// <summary>
         /// 获取物理网卡的Mac和对应的IP
         /// </summary>
